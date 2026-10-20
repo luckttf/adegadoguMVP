@@ -1,4 +1,3 @@
-
 # 🍷 BARNS Adega - PDV & Gestão de Estoque
 
 [![Quality Checks](https://github.com/luckttf/adegadoguMVP/actions/workflows/quality.yml/badge.svg)](https://github.com/luckttf/adegadoguMVP/actions/workflows/quality.yml)
@@ -25,27 +24,27 @@ Aplicação desktop de Ponto de Venda (PDV), controle de estoque e gestão opera
 
 ## 🛠️ Instalação e Uso
 
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/luckttf/adegadoguMVP.git
-   cd adegadoguMVP
-Crie e ative o ambiente virtual:
+**1. Clone o repositório:**
+```bash
+git clone https://github.com/luckttf/adegadoguMVP.git
+cd adegadoguMVP
+2. Crie e ative o ambiente virtual:
 
 powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-Instale as dependências:
+3. Instale as dependências:
 
-```bash
-    pip install -r requirements.txt
-    Inicie o aplicativo:
+bash
+pip install -r requirements.txt
+4. Inicie o aplicativo:
 
-```bash
-    python main.py
+bash
+python main.py
 🧪 Testes
 O projeto utiliza testes unitários que não dependem de interface gráfica para rodar. Para executar a suíte:
 
-```bash
-    python -m unittest discover -s tests -v
+bash
+python -m unittest discover -s tests -v
 📄 Licença
 Este projeto está licenciado sob a Licença MIT. Consulte o arquivo LICENSE para mais detalhes.
