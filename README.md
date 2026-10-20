@@ -36,16 +36,16 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 Instale as dependências:
 
-bash
-pip install -r requirements.txt
-Inicie o aplicativo:
+```bash
+    pip install -r requirements.txt
+    Inicie o aplicativo:
 
-bash
-python main.py
+```bash
+    python main.py
 🧪 Testes
 O projeto utiliza testes unitários que não dependem de interface gráfica para rodar. Para executar a suíte:
 
-bash
-python -m unittest discover -s tests -v
+```bash
+    python -m unittest discover -s tests -v
 📄 Licença
 Este projeto está licenciado sob a Licença MIT. Consulte o arquivo LICENSE para mais detalhes.
