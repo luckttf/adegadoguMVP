@@ -1,6 +1,7 @@
+
 # 🍷 BARNS Adega - PDV & Gestão de Estoque
 
-[![Quality Checks](https://github.com/SEU_USUARIO/NOME_DO_REPOSITORIO/actions/workflows/quality.yml/badge.svg)](https://github.com/SEU_USUARIO/NOME_DO_REPOSITORIO/actions/workflows/quality.yml/badge.svg)
+[![Quality Checks](https://github.com/luckttf/adegadoguMVP/actions/workflows/quality.yml/badge.svg)](https://github.com/luckttf/adegadoguMVP/actions/workflows/quality.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 
@@ -26,8 +27,8 @@ Aplicação desktop de Ponto de Venda (PDV), controle de estoque e gestão opera
 
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/SEU_USUARIO/NOME_DO_REPOSITORIO.git
-   cd NOME_DO_REPOSITORIO
+   git clone https://github.com/luckttf/adegadoguMVP.git
+   cd adegadoguMVP
 Crie e ative o ambiente virtual:
 
 powershell
