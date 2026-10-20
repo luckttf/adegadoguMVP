@@ -475,7 +475,7 @@ class PaginaEstoque(ctk.CTkFrame):
             except ValueError:
                 messagebox.showerror("Erro", "Valores numéricos inválidos.")
             except Exception as e:
-                messagebox.showerror("Erro", f"Falha ao cadastrar: {str(e)}")
+                messagebox.showerror("Erro", f"Falha ao cadastrar: {e!s}")
 
         ctk.CTkButton(janela, text="Salvar", command=salvar, corner_radius=RAIO_BOTAO,
                       fg_color=COR["verde"], hover_color=COR["verde_h"]).pack(pady=20)

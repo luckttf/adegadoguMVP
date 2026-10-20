@@ -11,7 +11,7 @@ def _agora() -> str:
     return datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
 
-def _abrir_garrafa_na_transacao(cur, produto_id: int) -> Dict[str, Any]:
+def _abrir_garrafa_na_transacao(cur, produto_id: int) -> dict[str, Any]:
     produto = cur.execute("SELECT id,nome,quantidade,doses_por_garrafa,volume_garrafa_ml,is_garrafa,ativo FROM produtos WHERE id=?", (produto_id,)).fetchone()
     if not produto or not produto['ativo']:
         raise ValueError("Garrafa não encontrada ou produto arquivado.")
@@ -39,7 +39,7 @@ def _abrir_garrafa_na_transacao(cur, produto_id: int) -> Dict[str, Any]:
     return {"id": bottle_id, "produto_id": produto_id, "nome": produto['nome'], "doses_iniciais": doses}
 
 
-def abrir_garrafa(produto_id: int, conn_externa: Optional[sqlite3.Connection] = None) -> Tuple[bool, str, int]:
+def abrir_garrafa(produto_id: int, conn_externa: sqlite3.Connection | None = None) -> tuple[bool, str, int]:
     owns = conn_externa is None
     conn = conn_externa if conn_externa is not None else conectar()
     try:
@@ -57,7 +57,7 @@ def abrir_garrafa(produto_id: int, conn_externa: Optional[sqlite3.Connection] = 
         if owns: conn.close()
 
 
-def prever_abertura_garrafas(itens: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def prever_abertura_garrafas(itens: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Pré-calcula garrafas que exigirão confirmação; não altera estoque."""
     demandas: dict[int, float] = {}
     nomes: dict[int, str] = {}
@@ -85,7 +85,7 @@ def prever_abertura_garrafas(itens: List[Dict[str, Any]]) -> List[Dict[str, Any]
     return out
 
 
-def fechar_garrafa(garrafa_aberta_id: int) -> Tuple[bool, str]:
+def fechar_garrafa(garrafa_aberta_id: int) -> tuple[bool, str]:
     with get_db() as (conn,cur):
         g=cur.execute("SELECT ga.*,p.nome FROM garrafas_abertas ga JOIN produtos p ON p.id=ga.produto_id WHERE ga.id=?",(garrafa_aberta_id,)).fetchone()
         if not g: return False,"Garrafa aberta não encontrada."
@@ -104,7 +104,7 @@ def fechar_garrafa(garrafa_aberta_id: int) -> Tuple[bool, str]:
     return True, f"Garrafa encerrada. Sobra registrada como perda: {remaining:.2f} dose(s)."
 
 
-def ajustar_doses_restantes(garrafa_aberta_id: int, novas_doses: float) -> Tuple[bool, str]:
+def ajustar_doses_restantes(garrafa_aberta_id: int, novas_doses: float) -> tuple[bool, str]:
     try: novas_doses=float(novas_doses)
     except (TypeError,ValueError): return False,"Quantidade de doses inválida."
     if not math.isfinite(novas_doses) or novas_doses < 0: return False,"A quantidade não pode ser negativa ou inválida."
@@ -124,7 +124,7 @@ def ajustar_doses_restantes(garrafa_aberta_id: int, novas_doses: float) -> Tuple
     return True,"Saldo de doses ajustado e auditado."
 
 
-def registrar_perda_dose(garrafa_aberta_id: int, quantidade: float, motivo: str = "Perda/descarte") -> Tuple[bool, str]:
+def registrar_perda_dose(garrafa_aberta_id: int, quantidade: float, motivo: str = "Perda/descarte") -> tuple[bool, str]:
     try: quantidade=float(quantidade)
     except (TypeError,ValueError): return False,"Quantidade de perda inválida."
     if not math.isfinite(quantidade) or quantidade <= 0: return False,"A quantidade de perda deve ser positiva."
@@ -147,7 +147,7 @@ def registrar_perda_dose(garrafa_aberta_id: int, quantidade: float, motivo: str 
     return True,"Perda de dose registrada e auditada."
 
 
-def obter_perdas_por_produto(produto_id: Optional[int] = None, limite: int = 100) -> List[Dict]:
+def obter_perdas_por_produto(produto_id: int | None = None, limite: int = 100) -> list[dict]:
     limite=max(1,min(int(limite),1000))
     with get_db() as (_,cur):
         if produto_id:
@@ -163,7 +163,7 @@ def obter_doses_disponiveis(produto_id: int) -> float:
         return float(row['q'] or 0)
 
 
-def obter_doses_disponiveis_por_produto() -> Dict[int, float]:
+def obter_doses_disponiveis_por_produto() -> dict[int, float]:
     """Retorna os saldos de doses de todos os produtos em uma única consulta."""
     with get_db() as (_, cur):
         rows = cur.execute("""SELECT produto_id, COALESCE(SUM(doses_restantes), 0) AS quantidade
@@ -173,7 +173,7 @@ def obter_doses_disponiveis_por_produto() -> Dict[int, float]:
         return {int(row["produto_id"]): float(row["quantidade"] or 0) for row in rows}
 
 
-def obter_garrafas_abertas(produto_id: Optional[int] = None) -> List[Dict]:
+def obter_garrafas_abertas(produto_id: int | None = None) -> list[dict]:
     with get_db() as (_,cur):
         where="WHERE ga.status='aberta' AND ga.doses_restantes>0"; params=[]
         if produto_id is not None: where += " AND ga.produto_id=?"; params.append(produto_id)

@@ -2,7 +2,8 @@
 from __future__ import annotations
 
 import unicodedata
-from typing import Iterable, Optional
+from typing import Optional
+from collections.abc import Iterable
 
 
 def normalizar_texto(valor: str) -> str:
@@ -15,7 +16,7 @@ def nome_base_sugestao(valor: str) -> str:
     return str(valor or "").split(" — ", 1)[0].strip()
 
 
-def selecionar_sugestao(termo: str, sugestoes: Iterable[str], destacada: Optional[str] = None) -> Optional[str]:
+def selecionar_sugestao(termo: str, sugestoes: Iterable[str], destacada: str | None = None) -> str | None:
     """Prioriza seleção por setas, depois correspondência exata e por fim a primeira opção."""
     itens = list(sugestoes or [])
     if not itens:

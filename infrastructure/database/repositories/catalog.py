@@ -22,15 +22,15 @@ def _inteiro_exato(valor, campo: str) -> int:
     return int(numero)
 
 
-def obter_todas_categorias() -> List[Tuple[int, str]]:
+def obter_todas_categorias() -> list[tuple[int, str]]:
     with get_db() as (_, cur):
         cur.execute("SELECT id, nome FROM categorias ORDER BY nome")
         return [(row["id"], row["nome"]) for row in cur.fetchall()]
 
-def obter_categorias_unicas() -> List[str]:
+def obter_categorias_unicas() -> list[str]:
     return [nome for _, nome in obter_todas_categorias()]
 
-def adicionar_categoria(nome: str) -> Tuple[bool, str]:
+def adicionar_categoria(nome: str) -> tuple[bool, str]:
     try:
         with get_db() as (conn, cur):
             conn.execute("INSERT INTO categorias (nome) VALUES (?)", (nome,))
@@ -38,7 +38,7 @@ def adicionar_categoria(nome: str) -> Tuple[bool, str]:
     except sqlite3.IntegrityError:
         return False, "Categoria já existe."
 
-def remover_categoria(cat_id: int) -> Tuple[bool, str]:
+def remover_categoria(cat_id: int) -> tuple[bool, str]:
     with get_db() as (conn, cur):
         cur.execute("SELECT COUNT(*) FROM produtos WHERE categoria_id = ?", (cat_id,))
         if cur.fetchone()[0] > 0:
@@ -53,7 +53,7 @@ def _row_to_dict(row: sqlite3.Row) -> dict:
     d["is_garrafa"] = bool(d.get("is_garrafa", 0))
     return d
 
-def buscar_produtos(termo: str = "", limite: Optional[int] = None) -> List[Dict[str, Any]]:
+def buscar_produtos(termo: str = "", limite: int | None = None) -> list[dict[str, Any]]:
     """Pesquisa produtos; `limite` permite consultas baratas para autocomplete."""
     termo = (termo or "").strip()
     params = []
@@ -77,7 +77,7 @@ def buscar_produtos(termo: str = "", limite: Optional[int] = None) -> List[Dict[
         cur.execute(query, params)
         return [_row_to_dict(r) for r in cur.fetchall()]
 
-def buscar_produto_por_codigo_barras(codigo: str) -> Optional[Dict[str, Any]]:
+def buscar_produto_por_codigo_barras(codigo: str) -> dict[str, Any] | None:
     codigo = (codigo or "").strip()
     if not codigo:
         return None
@@ -122,10 +122,10 @@ def _inserir_produto_cur(cur, nome, categoria_nome, quantidade, preco, codigo_ba
 
 
 def adicionar_produto(nome: str, categoria_nome: str, quantidade: int, preco: float,
-                      codigo_barras: Optional[str] = None, estoque_minimo: int = 5,
+                      codigo_barras: str | None = None, estoque_minimo: int = 5,
                       estoque_medio: int = 15, preco_custo: float = 0.0,
                       is_garrafa: bool = False, doses_por_garrafa: float = 0.0,
-                      preco_dose: float = 0.0, volume_garrafa_ml: int = VOLUME_GARRAFA_ML_PADRAO) -> Tuple[bool, str]:
+                      preco_dose: float = 0.0, volume_garrafa_ml: int = VOLUME_GARRAFA_ML_PADRAO) -> tuple[bool, str]:
     import math
     nome = (nome or "").strip()
     categoria_nome = (categoria_nome or "").strip()
@@ -170,12 +170,12 @@ def adicionar_produto(nome: str, categoria_nome: str, quantidade: int, preco: fl
 
 
 def editar_produto_completo(produto_id: int, nome: str, categoria_nome: str, preco: float,
-                            nova_quantidade: int, codigo_barras: Optional[str] = None,
-                            estoque_minimo: Optional[int] = None, estoque_medio: Optional[int] = None,
-                            preco_custo: Optional[float] = None, is_garrafa: Optional[bool] = None,
-                            doses_por_garrafa: Optional[float] = None,
-                            preco_dose: Optional[float] = None,
-                            volume_garrafa_ml: Optional[int] = None) -> Tuple[bool, str]:
+                            nova_quantidade: int, codigo_barras: str | None = None,
+                            estoque_minimo: int | None = None, estoque_medio: int | None = None,
+                            preco_custo: float | None = None, is_garrafa: bool | None = None,
+                            doses_por_garrafa: float | None = None,
+                            preco_dose: float | None = None,
+                            volume_garrafa_ml: int | None = None) -> tuple[bool, str]:
     import math
     nome = (nome or "").strip()
     categoria_nome = (categoria_nome or "").strip()
@@ -233,7 +233,7 @@ def editar_produto_completo(produto_id: int, nome: str, categoria_nome: str, pre
         if "codigo_barras" in str(exc).lower(): return False, "Código de barras já cadastrado."
         return False, "Já existe outro produto com esse nome."
 
-def deletar_produto(produto_id: int) -> Tuple[bool, str]:
+def deletar_produto(produto_id: int) -> tuple[bool, str]:
     """Arquiva produto sem destruir histórico financeiro ou garrafas rastreadas."""
     with get_db() as (conn, cur):
         produto = cur.execute("SELECT nome FROM produtos WHERE id=? AND ativo=1", (produto_id,)).fetchone()
@@ -248,7 +248,7 @@ def deletar_produto(produto_id: int) -> Tuple[bool, str]:
                     (produto_id,'produto_arquivado','Produto arquivado; históricos preservados.',0,agora,produto['nome']))
     return True, "Produto arquivado. O histórico foi preservado."
 
-def listar_produtos_arquivados(termo: str = "", limite: int = 250) -> List[Dict[str, Any]]:
+def listar_produtos_arquivados(termo: str = "", limite: int = 250) -> list[dict[str, Any]]:
     """Lista produtos arquivados sem expô-los no catálogo operacional/PDV."""
     termo = (termo or "").strip()
     try:
@@ -271,7 +271,7 @@ def listar_produtos_arquivados(termo: str = "", limite: int = 250) -> List[Dict[
         return [_row_to_dict(row) for row in cur.fetchall()]
 
 
-def restaurar_produto(produto_id: int) -> Tuple[bool, str]:
+def restaurar_produto(produto_id: int) -> tuple[bool, str]:
     """Reativa um produto arquivado sem recriar ou apagar seus históricos."""
     try:
         with get_db() as (conn, cur):
@@ -306,7 +306,7 @@ def restaurar_produto(produto_id: int) -> Tuple[bool, str]:
         return False, "Não foi possível restaurar o produto por conflito de dados."
 
 
-def registrar_entrada(produto_id: int, qtd: int) -> Tuple[bool, str]:
+def registrar_entrada(produto_id: int, qtd: int) -> tuple[bool, str]:
     try: qtd = _inteiro_exato(qtd, "Quantidade")
     except (TypeError, ValueError): return False, "A quantidade precisa ser um número inteiro válido."
     if qtd <= 0: return False, "A quantidade deve ser um inteiro maior que zero."
@@ -319,7 +319,7 @@ def registrar_entrada(produto_id: int, qtd: int) -> Tuple[bool, str]:
         cur.execute("INSERT INTO auditoria(produto_id,acao,descricao,quantidade,data,nome_produto) VALUES(?,?,?,?,?,?)",(produto_id,'entrada',f"Entrada de {qtd} unidades",qtd,data,prod['nome']))
     return True, f"Entrada de {qtd} un. de '{prod['nome']}' registrada."
 
-def registrar_saida(produto_id: int, qtd: int) -> Tuple[bool, str]:
+def registrar_saida(produto_id: int, qtd: int) -> tuple[bool, str]:
     try: qtd = _inteiro_exato(qtd, "Quantidade")
     except (TypeError, ValueError): return False, "A quantidade precisa ser um número inteiro válido."
     if qtd <= 0: return False, "A quantidade deve ser um inteiro maior que zero."
@@ -336,7 +336,7 @@ def registrar_saida(produto_id: int, qtd: int) -> Tuple[bool, str]:
 
 
 # [CORREÇÃO] Importação de CSV 100% Transacional e com suporte a campos completos.
-def importar_csv(caminho_arquivo: str) -> Tuple[int, int, List[str]]:
+def importar_csv(caminho_arquivo: str) -> tuple[int, int, list[str]]:
     total = 0
     importados = 0
     erros = []
@@ -396,4 +396,4 @@ def importar_csv(caminho_arquivo: str) -> Tuple[int, int, List[str]]:
     except FileNotFoundError:
         return 0, 0, ["Arquivo não encontrado."]
     except Exception as e:
-        return 0, 0, [f"Erro ao ler CSV: {str(e)}"]
+        return 0, 0, [f"Erro ao ler CSV: {e!s}"]

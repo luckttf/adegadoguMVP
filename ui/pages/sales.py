@@ -11,8 +11,8 @@ class PaginaVendas(ctk.CTkFrame):
     def __init__(self, master, app):
         super().__init__(master, fg_color=COR["fundo"])
         self.app = app
-        self.carrinho: List[Dict] = []
-        self._cache: List[Dict] = []
+        self.carrinho: list[dict] = []
+        self._cache: list[dict] = []
         self._desconto_valido = True
         self._construir()
         self._recarregar_produtos()
@@ -381,7 +381,6 @@ class PaginaVendas(ctk.CTkFrame):
         else:
             self.lbl_total.configure(text="DESCONTO INVÁLIDO", text_color=COR["vermelho"])
         self.lbl_itens.configure(text=f"{n_itens} itens" if n_itens != 1 else "1 item")
-        return None
 
     def _renderizar_carrinho(self):
         for w in self.frame_carrinho.winfo_children():

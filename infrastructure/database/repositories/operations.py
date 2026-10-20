@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Optional, Dict, List, Tuple, Any
 from infrastructure.database.connection import get_db
 
-def abrir_dia() -> Tuple[Optional[int], bool]:
+def abrir_dia() -> tuple[int | None, bool]:
     with get_db() as (conn,cur):
         cur.execute("BEGIN IMMEDIATE")
         row=cur.execute("SELECT id FROM dias_operacao WHERE status='aberto' LIMIT 1").fetchone()
@@ -41,12 +41,12 @@ def fechar_dia(dia_id: int):
         if cur.rowcount != 1:
             raise ValueError("O dia mudou de estado durante o fechamento. Atualize a tela e tente novamente.")
 
-def obter_dia_aberto() -> Optional[Dict[str, Any]]:
+def obter_dia_aberto() -> dict[str, Any] | None:
     with get_db() as (_,cur):
         row=cur.execute("SELECT * FROM dias_operacao WHERE status='aberto' ORDER BY id DESC LIMIT 1").fetchone()
         return dict(row) if row else None
 
-def obter_resumo_dia_operacao(dia_id: Optional[int] = None) -> Tuple[Optional[Dict], List[Dict]]:
+def obter_resumo_dia_operacao(dia_id: int | None = None) -> tuple[dict | None, list[dict]]:
     with get_db() as (conn,cur):
         if dia_id is None:
             dia=cur.execute("SELECT * FROM dias_operacao WHERE status='aberto' ORDER BY id DESC LIMIT 1").fetchone()
@@ -65,7 +65,7 @@ def obter_resumo_dia_operacao(dia_id: Optional[int] = None) -> Tuple[Optional[Di
 
 
 
-def listar_dias_operacao(limite: int = 50, offset: int = 0) -> List[Dict[str, Any]]:
+def listar_dias_operacao(limite: int = 50, offset: int = 0) -> list[dict[str, Any]]:
     """Retorna uma fatia dos dias, sem remover ou ocultar registros do banco.
 
     ``offset`` habilita paginação na interface; o limite é apenas visual e não
@@ -95,7 +95,7 @@ def contar_dias_operacao() -> int:
         return int(cur.execute("SELECT COUNT(*) FROM dias_operacao").fetchone()[0])
 
 
-def obter_resumo_pagamentos_dia(dia_id: int) -> List[Dict[str, Any]]:
+def obter_resumo_pagamentos_dia(dia_id: int) -> list[dict[str, Any]]:
     """Valores recebidos efetivamente, discriminados pelo meio de pagamento."""
     with get_db() as (_, cur):
         rows = cur.execute("""SELECT vp.forma_pagamento, SUM(vp.valor) AS total_liquido,

@@ -11,7 +11,7 @@ class CalendarioPopup(ctk.CTkToplevel):
               "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
     _DIAS_SEMANA = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
 
-    def __init__(self, master, data_inicial: Optional[date | datetime], on_select):
+    def __init__(self, master, data_inicial: date | datetime | None, on_select):
         super().__init__(master)
         self.title("Selecionar Data")
         self.geometry("380x400")
@@ -188,5 +188,5 @@ class SeletorData(ctk.CTkFrame):
         if self.on_change:
             self.on_change()
 
-    def get_data_str(self) -> Optional[str]:
+    def get_data_str(self) -> str | None:
         return self.data_selecionada.strftime("%d/%m/%Y") if self.data_selecionada else None

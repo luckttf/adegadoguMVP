@@ -33,3 +33,12 @@ settings.json
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Relatórios internos de desenvolvimento (não versionar)
+REDESIGN_PLAN.md
+REDESIGN_V4.md
+RELATORIO_ESTABILIZACAO.md
+
+# Notas pessoais de desenvolvimento
+notas.md
+NOTAS.md

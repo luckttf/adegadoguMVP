@@ -5,7 +5,8 @@ headless e manter a lógica de mapeamento separada da interface gráfica.
 """
 from __future__ import annotations
 
-from typing import Any, Mapping
+from typing import Any
+from collections.abc import Mapping
 
 PALETAS: dict[str, dict[str, str]] = {
     "claro": {

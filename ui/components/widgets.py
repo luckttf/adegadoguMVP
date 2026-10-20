@@ -3,7 +3,8 @@ from __future__ import annotations
 
 import logging
 import unicodedata
-from typing import Callable, Optional
+from typing import Optional
+from collections.abc import Callable
 
 import customtkinter as ctk
 from tkinter import TclError
@@ -14,7 +15,7 @@ from domain.autocomplete_rules import nome_base_sugestao, selecionar_sugestao
 log = logging.getLogger(__name__)
 
 
-def remover_acentos(txt: Optional[str]) -> str:
+def remover_acentos(txt: str | None) -> str:
     if not txt:
         return ""
     nfkd = unicodedata.normalize("NFKD", txt)
@@ -87,8 +88,8 @@ def habilitar_foco_teclado(container) -> None:
                         border_width_original, border_color_original = 0, COR["borda"]
                     # A cor base é armazenada no widget para que a troca global de
                     # tema também atualize o valor restaurado ao perder o foco.
-                    setattr(widget, "_barns_original_border_color", border_color_original)
-                    setattr(widget, "_barns_original_border_width", border_width_original)
+                    widget._barns_original_border_color = border_color_original
+                    widget._barns_original_border_width = border_width_original
 
                     def ao_focar(_event, botao=widget):
                         try:
@@ -96,7 +97,6 @@ def habilitar_foco_teclado(container) -> None:
                                             border_color=COR["dourado"])
                         except (TclError, ValueError):
                             pass
-                        return None
 
                     def ao_sair(_event, botao=widget):
                         try:
@@ -106,7 +106,6 @@ def habilitar_foco_teclado(container) -> None:
                             )
                         except TclError:
                             pass
-                        return None
 
                     def ativar(_event, botao=widget):
                         try:
@@ -121,7 +120,7 @@ def habilitar_foco_teclado(container) -> None:
                     canvas.bind("<Return>", ativar, add="+")
                     canvas.bind("<KP_Enter>", ativar, add="+")
                     canvas.bind("<space>", ativar, add="+")
-                    setattr(widget, "_barns_keyboard_ready", True)
+                    widget._barns_keyboard_ready = True
 
             tipo_checkbox = getattr(ctk, "CTkCheckBox", None)
             if (tipo_checkbox is not None and isinstance(widget, tipo_checkbox)
@@ -138,14 +137,12 @@ def habilitar_foco_teclado(container) -> None:
                             controle.configure(border_width=2, border_color=COR["dourado"])
                         except (TclError, TypeError):
                             pass
-                        return None
 
                     def checkbox_saiu(_event, controle=widget):
                         try:
                             controle.configure(border_width=1, border_color=COR["borda_azul"])
                         except (TclError, TypeError):
                             pass
-                        return None
 
                     def checkbox_ativar(_event, controle=widget):
                         try:
@@ -159,7 +156,7 @@ def habilitar_foco_teclado(container) -> None:
                     canvas.bind("<space>", checkbox_ativar, add="+")
                     canvas.bind("<Return>", checkbox_ativar, add="+")
                     canvas.bind("<KP_Enter>", checkbox_ativar, add="+")
-                    setattr(widget, "_barns_checkbox_keyboard_ready", True)
+                    widget._barns_checkbox_keyboard_ready = True
 
             for child in widget.winfo_children():
                 visitar(child)
@@ -320,13 +317,13 @@ class AutocompleteEntry(ctk.CTkFrame):
     def _on_key_release(self, event=None):
         # [CORREÇÃO] Adicionado 'KP_Enter' para ignorar o Enter do teclado numérico e não refazer a busca.
         if event and event.keysym in ("Return", "KP_Enter", "Up", "Down", "Escape", "Tab", "Shift_L", "Shift_R"):
-            return None
+            return
         self._cancelar_busca_agendada()
         try:
             self._after_id = self.after(125, self._atualizar_sugestoes)
         except TclError:
             self._after_id = None
-        return None
+        return
 
     def _atualizar_sugestoes(self):
         self._after_id = None

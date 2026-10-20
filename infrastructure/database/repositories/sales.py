@@ -22,7 +22,7 @@ def _dinheiro(valor: Any) -> Decimal:
 
 
 def _centavos(valor: Decimal) -> int:
-    return int((valor / CENTAVO).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+    return int((valor / CENTAVO).quantize(Decimal(1), rounding=ROUND_HALF_UP))
 
 
 def _data_agora() -> str:
@@ -89,19 +89,19 @@ def _distribuir_desconto_geral(desconto_centavos: int, bases_centavos: list[int]
     return partes
 
 
-def prever_abertura_garrafas(itens: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def prever_abertura_garrafas(itens: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """Delega prévia à regra de doses sem expor detalhes de SQL à interface."""
     from infrastructure.database.repositories.bottles import prever_abertura_garrafas as prever
     return prever(itens)
 
 
-def registrar_venda_completa(itens: List[Dict], forma_pagamento: str,
+def registrar_venda_completa(itens: list[dict], forma_pagamento: str,
                              desconto_percentual: float = 0.0, status: str = "finalizado",
-                             dia_operacao_id: Optional[int] = None,
-                             observacao: Optional[str] = None, *,
-                             garrafas_autorizadas: Optional[List[int]] = None,
-                             pagamentos: Optional[List[Dict[str, Any]]] = None,
-                             cliente_nome: Optional[str] = None) -> int:
+                             dia_operacao_id: int | None = None,
+                             observacao: str | None = None, *,
+                             garrafas_autorizadas: list[int] | None = None,
+                             pagamentos: list[dict[str, Any]] | None = None,
+                             cliente_nome: str | None = None) -> int:
     """Registra venda + estoque + doses + pagamentos em uma transação atômica.
     
     ``pendente`` representa fiado: o produto foi entregue e baixa o estoque,
@@ -191,7 +191,7 @@ def registrar_venda_completa(itens: List[Dict], forma_pagamento: str,
             })
 
         base_apos_item = total_bruto_cents - total_desc_item_cents
-        desconto_geral_cents = int((Decimal(base_apos_item) * pct_geral / Decimal(100)).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+        desconto_geral_cents = int((Decimal(base_apos_item) * pct_geral / Decimal(100)).quantize(Decimal(1), rounding=ROUND_HALF_UP))
         desconto_geral_cents = max(0, min(desconto_geral_cents, base_apos_item))
         parcelas_gerais = _distribuir_desconto_geral(desconto_geral_cents, [i["base_apos_desconto_cents"] for i in itens])
         total_liquido_cents = 0
@@ -315,8 +315,8 @@ def registrar_venda_completa(itens: List[Dict], forma_pagamento: str,
 
 
 def listar_vendas(status=None, data_inicio=None, data_fim=None, dia_operacao_id=None,
-                 limite: Optional[int] = None, offset: int = 0,
-                 venda_id: Optional[int] = None) -> List[Dict]:
+                 limite: int | None = None, offset: int = 0,
+                 venda_id: int | None = None) -> list[dict]:
     """Lista vendas com itens/pagamentos carregados em lote (sem consultas N+1)."""
     if limite is not None:
         try:
@@ -433,7 +433,7 @@ def contar_vendas(status=None, data_inicio=None, data_fim=None, dia_operacao_id=
         return int(cur.execute(query, params).fetchone()[0])
 
 
-def atualizar_status_venda(venda_id: int, novo_status: str, pagamentos: Optional[List[Dict[str, Any]]] = None):
+def atualizar_status_venda(venda_id: int, novo_status: str, pagamentos: list[dict[str, Any]] | None = None):
     """Quita um fiado somente quando os pagamentos fecham o total exato."""
     if novo_status != "finalizado":
         raise ValueError("Transição de status não permitida por esta operação.")
@@ -468,7 +468,7 @@ def _historico_unificado_sql() -> str:
     )
 
 
-def _filtro_historico(data: Optional[str]):
+def _filtro_historico(data: str | None):
     if data:
         _data_key(data)
         return "WHERE data LIKE ?", [f"{data}%"]
@@ -476,8 +476,8 @@ def _filtro_historico(data: Optional[str]):
 
 
 def buscar_historico_completo(
-    data: Optional[str] = None, limite: int = 200, offset: int = 0,
-) -> List[Dict]:
+    data: str | None = None, limite: int = 200, offset: int = 0,
+) -> list[dict]:
     """Lista movimentações por página; os registros fora da página continuam no banco."""
     try:
         limite, offset = int(limite), int(offset)
@@ -500,7 +500,7 @@ def buscar_historico_completo(
         return [dict(r) for r in cur.fetchall()]
 
 
-def contar_historico_completo(data: Optional[str] = None) -> int:
+def contar_historico_completo(data: str | None = None) -> int:
     """Conta o total de movimentações, sem o limite de exibição da interface."""
     base = _historico_unificado_sql()
     where, params = _filtro_historico(data)

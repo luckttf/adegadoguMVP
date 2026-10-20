@@ -7,7 +7,7 @@ from contextlib import contextmanager
 from typing import Optional
 
 
-def remover_acentos(txt: Optional[str]) -> str:
+def remover_acentos(txt: str | None) -> str:
     if not txt:
         return ""
     nfkd = unicodedata.normalize("NFKD", txt)

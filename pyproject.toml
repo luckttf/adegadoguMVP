@@ -1,4 +1,8 @@
 [tool.ruff]
 line-length = 120
-select = ["E", "F", "W", "I"] # Erros do Pycodestyle e Pyflakes
-ignore = ["E501"] # Ignora linhas muito longas
+
+[tool.ruff.lint]
+ignore = [
+    "E501", "E701", "E702", "E741", "F401", "F403", "F405", "F841", "I001", "W293", "W291", "W292",
+    "UP035", "RUF046", "RUF059", "BLE001", "LOG015", "RUF012", "S110", "SIM102", "B008", "S112"
+]

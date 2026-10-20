@@ -15,7 +15,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 import database
-import services.backup_service as backup_service
+from services import backup_service
 from domain.autocomplete_rules import selecionar_sugestao
 from services.backup_service import criar_backup
 

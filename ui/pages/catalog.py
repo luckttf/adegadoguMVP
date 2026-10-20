@@ -165,7 +165,7 @@ class PaginaBanco(ctk.CTkFrame):
                 else:
                     messagebox.showerror("Erro", msg)
             except Exception as e:
-                messagebox.showerror("Erro", f"Valores inválidos.\n{str(e)}")
+                messagebox.showerror("Erro", f"Valores inválidos.\n{e!s}")
 
         ctk.CTkButton(janela, text="Salvar", command=salvar, corner_radius=RAIO_BOTAO,
                       fg_color=COR["verde"], hover_color=COR["verde_h"]).pack(pady=20)
