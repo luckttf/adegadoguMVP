@@ -1,0 +1,4 @@
+[tool.ruff]
+line-length = 120
+select = ["E", "F", "W", "I"] # Erros do Pycodestyle e Pyflakes
+ignore = ["E501"] # Ignora linhas muito longas
